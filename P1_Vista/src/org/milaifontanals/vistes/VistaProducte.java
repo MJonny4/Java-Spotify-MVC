@@ -511,22 +511,22 @@ public class VistaProducte extends JPanel {
           case "CANCO":
             if (buttonAfegir.isEnabled()) {
               afegirCancoButton();
-            } else {
-              // modificarCanco();
+            } else if (buttonAfegir.isEnabled() == false && buttonModificar.isEnabled() == false) {
+              modificarCancoButton();
             }
             break;
           case "ALBUM":
             if (buttonAfegir.isEnabled()) {
               afegirAlbumButton();
-            } else {
-              // modificarAlbum();
+            } else if (buttonAfegir.isEnabled() == false && buttonModificar.isEnabled() == false) {
+              // modificarAlbumButton();
             }
             break;
           case "LLISTA":
             if (buttonAfegir.isEnabled()) {
               afegirLlistaButton();
-            } else {
-              // modificarLlista();
+            } else if (buttonAfegir.isEnabled() == false && buttonModificar.isEnabled() == false) {
+              // modificarLlista(Button);
             }
             break;
         }
@@ -1231,7 +1231,100 @@ public class VistaProducte extends JPanel {
     }
   }
 
-  public void modificar(){
-    
+  public void modificar() {
+    if (tableProductes.getSelectedColumnCount() == 1) {
+      netejar();
+      int row = tableProductes.getSelectedRow();
+
+      String titol = tableProductes.getValueAt(row, 0).toString();
+      String estil = tableProductes.getValueAt(row, 1).toString();
+      String tipus = tableProductes.getValueAt(row, 2).toString();
+      String actiu = tableProductes.getValueAt(row, 3).toString();
+      long id = getId(titol);
+
+      mostrarTipus(tipus, titol, estil, actiu, id);
+
+      if (tipus == "CANCO") {
+        afegirCanco();
+      } else if (tipus == "ALBUM") {
+        afegirAlbum();
+      } else if (tipus == "LLISTA") {
+        afegirLlista();
+      }
+      buttonAfegir.setEnabled(false);
+    }
+  }
+
+  private void modificarCancoButton() {
+    String errorAfegirCanco = "<html>";
+    String titol_anterior = tableProductes.getValueAt(tableProductes.getSelectedRow(), 0).toString();
+
+    String producte_titol = textTitolMod.getText();
+    String producte_estil = cbEstilMod.getSelectedItem().toString();
+    char producte_actiu;
+    if (rbSiActiuMod.isSelected()) {
+      producte_actiu = 'S';
+    } else {
+      producte_actiu = 'N';
+    }
+    char producte_tipus = 'C';
+    String canco_durada = textDuradaMod.getText();
+    String canco_any_creacio = textAnyCreacioMod.getText();
+    String canco_interpret = cbInterpretsMod.getSelectedItem().toString();
+    long producte_id = getId(titol_anterior);
+    int producte_id_int = (int) producte_id;
+    // textIdHiddenMod.setText(String.valueOf(producte_id));
+
+    if (producte_titol.equals("") || producte_titol == null || producte_titol.isEmpty()
+        || producte_titol.length() > 100) {
+      errorAfegirCanco += "El titol no pot ser buit i tenir mes de 100 caracters.<br>";
+    }
+
+    if (canco_durada.equals("") || canco_durada == null || canco_durada.isEmpty()) {
+      errorAfegirCanco += "La durada no pot ser buida.<br>";
+    } else if (canco_durada.contains(".") || canco_durada.contains(",")) {
+      errorAfegirCanco += "La durada ha de ser un numero enter.<br>";
+    } else if (canco_durada.matches(".*[a-zA-Z]+.*")) {
+      errorAfegirCanco += "La durada ha de ser un numero enter.<br>";
+    } else if (Integer.parseInt(canco_durada) < 1 || Integer.parseInt(canco_durada) > 600) {
+      errorAfegirCanco += "La durada ha de ser un numero entre 1 i 600.<br>";
+    }
+
+    if (canco_any_creacio.equals("") || canco_any_creacio == null || canco_any_creacio.isEmpty()) {
+      errorAfegirCanco += "L'any de creacio no pot ser buit.<br>";
+    } else if (canco_any_creacio.contains(".") || canco_any_creacio.contains(",")) {
+      errorAfegirCanco += "L'any de creacio ha de ser un numero enter.<br>";
+    } else if (canco_any_creacio.matches(".*[a-zA-Z]+.*")) {
+      errorAfegirCanco += "L'any de creacio ha de ser un numero enter.<br>";
+    } else if (Integer.parseInt(canco_any_creacio) < 1900
+        || Integer.parseInt(canco_any_creacio) > 2022) {
+      errorAfegirCanco += "L'any de creacio ha de ser un numero entre 1900 i 2022.<br>";
+    }
+
+    errorAfegirCanco += "</html>";
+
+    if (!errorAfegirCanco.equals("<html></html>")) {
+      labelErrorMod.setVisible(true);
+      labelErrorMod.setText(errorAfegirCanco);
+    } else {
+      try {
+        DBProducte.updateCanco(producte_id_int, producte_titol, producte_estil, producte_actiu,
+            Integer.parseInt(canco_any_creacio), canco_interpret, Integer.parseInt(canco_durada));
+        labelErrorMod.setText("");
+        tableProductes.clearSelection();
+        filtrar();
+        JOptionPane.showConfirmDialog(null, "Canco Modificada Correctament", "Canco modificada!",
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.INFORMATION_MESSAGE);
+        // wait for JOptionPane to close and then netejar() and return;
+        netejar();
+      } catch (PersistenciaException error) {
+        System.out.println(error.getMessage());
+        labelErrorMod.setText("");
+        tableProductes.clearSelection();
+        filtrar();
+        netejar();
+      }
+    }
   }
 }
