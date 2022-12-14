@@ -726,11 +726,12 @@ public class DBProducte {
       ps.setString(3, estil_nom);
       ps.setString(4, String.valueOf(producte_tipus));
       ps.executeUpdate();
-      String sql2 = "INSERT INTO album (album_id, album_any_creacio) "
-          + "VALUES ((SELECT producte_id FROM producte WHERE producte_titol = ?), ?)";
+      String sql2 = "INSERT INTO album (album_id, album_any_creacio, album_durada) "
+          + "VALUES ((SELECT producte_id FROM producte WHERE producte_titol = ?), ?, ?)";
       ps2 = Persistencia.getConnection().prepareStatement(sql2);
       ps2.setString(1, producte_titol);
       ps2.setInt(2, any_creacio_canco);
+      ps2.setInt(3, 0);
       ps2.executeUpdate();
     } catch (SQLException e) {
       e.printStackTrace();
@@ -761,10 +762,11 @@ public class DBProducte {
       ps.setString(3, estil_nom);
       ps.setString(4, String.valueOf(producte_tipus));
       ps.executeUpdate();
-      String sql2 = "INSERT INTO llista (llista_id) "
-          + "VALUES ((SELECT producte_id FROM producte WHERE producte_titol = ?))";
+      String sql2 = "INSERT INTO llista (llista_id, llista_durada) "
+          + "VALUES ((SELECT producte_id FROM producte WHERE producte_titol = ?), ?)";
       ps2 = Persistencia.getConnection().prepareStatement(sql2);
       ps2.setString(1, producte_titol);
+      ps2.setInt(2, 0);
       ps2.executeUpdate();
     } catch (SQLException e) {
       e.printStackTrace();

@@ -5,8 +5,10 @@
  */
 package org.milaifontanals.vistes;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -19,9 +21,12 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -499,6 +504,46 @@ public class VistaProducte extends JPanel {
         afegir();
       }
     });
+    buttonGuardarMod.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent e) {
+        String tipus = cbTipusMod.getSelectedItem().toString();
+        switch (tipus) {
+          case "CANCO":
+            if (buttonAfegir.isEnabled()) {
+              afegirCancoButton();
+            } else {
+              // modificarCanco();
+            }
+            break;
+          case "ALBUM":
+            if (buttonAfegir.isEnabled()) {
+              afegirAlbumButton();
+            } else {
+              // modificarAlbum();
+            }
+            break;
+          case "LLISTA":
+            if (buttonAfegir.isEnabled()) {
+              afegirLlistaButton();
+            } else {
+              // modificarLlista();
+            }
+            break;
+        }
+      }
+    });
+    buttonCancelarMod.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent e) {
+        labelErrorMod.setText("");
+        tableProductes.clearSelection();
+        netejar();
+      }
+    });
+    buttonModificar.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent e) {
+        modificar();
+      }
+    });
   }
 
   public VistaProducte() {
@@ -892,97 +937,35 @@ public class VistaProducte extends JPanel {
     carregarRbActiuMod();
     rbSiActiuMod.setSelected(true);
     carregarCbInterpretsMod();
-    if (cbTipusMod.getSelectedItem().equals("CANCO")) {
-      modificarCanco();
 
-      buttonGuardarMod.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          String errorAfegirCanco = "<html>";
+    boolean afegint = true;
 
-          String producte_titol = textTitolMod.getText();
-          String producte_estil = cbEstilMod.getSelectedItem().toString();
-          char producte_actiu;
-          if (rbSiActiuMod.isSelected()) {
-            producte_actiu = 'S';
-          } else {
-            producte_actiu = 'N';
-          }
-          char producte_tipus = 'C';
-          String canco_durada = textDuradaMod.getText();
-          String canco_any_creacio = textAnyCreacioMod.getText();
-          String canco_interpret = cbInterpretsMod.getSelectedItem().toString();
+    while (afegint) {
+      int opcio = -1;
+      opcio = JOptionPane.showOptionDialog(null, "Quin tipus de producte vols afegir?", "Afegir Producte",
+          JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+          new String[] { "Cançó", "Àlbum", "Llista" }, null);
 
-          if (producte_titol.equals("") || producte_titol == null || producte_titol.isEmpty()
-              || producte_titol.length() > 100) {
-            errorAfegirCanco += "El titol no pot ser buit i tenir mes de 100 caracters.<br>";
-          }
-
-          if (canco_durada.equals("") || canco_durada == null || canco_durada.isEmpty()) {
-            errorAfegirCanco += "La durada no pot ser buida.<br>";
-          } else if (canco_durada.contains(".") || canco_durada.contains(",")) {
-            errorAfegirCanco += "La durada ha de ser un numero enter.<br>";
-          } else if (canco_durada.matches(".*[a-zA-Z]+.*")) {
-            errorAfegirCanco += "La durada ha de ser un numero enter.<br>";
-          } else if (Integer.parseInt(canco_durada) < 1 || Integer.parseInt(canco_durada) > 600) {
-            errorAfegirCanco += "La durada ha de ser un numero entre 1 i 600.<br>";
-          }
-
-          if (canco_any_creacio.equals("") || canco_any_creacio == null || canco_any_creacio.isEmpty()) {
-            errorAfegirCanco += "L'any de creacio no pot ser buit.<br>";
-          } else if (canco_any_creacio.contains(".") || canco_any_creacio.contains(",")) {
-            errorAfegirCanco += "L'any de creacio ha de ser un numero enter.<br>";
-          } else if (canco_any_creacio.matches(".*[a-zA-Z]+.*")) {
-            errorAfegirCanco += "L'any de creacio ha de ser un numero enter.<br>";
-          } else if (Integer.parseInt(canco_any_creacio) < 1900
-              || Integer.parseInt(canco_any_creacio) > 2022) {
-            errorAfegirCanco += "L'any de creacio ha de ser un numero entre 1900 i 2022.<br>";
-          }
-
-          errorAfegirCanco += "</html>";
-
-          if (!errorAfegirCanco.equals("<html></html>")) {
-            labelErrorMod.setVisible(true);
-            labelErrorMod.setText(errorAfegirCanco);
-          } else {
-            try {
-              DBProducte.insertCanco(producte_titol, producte_estil, producte_actiu, producte_tipus,
-                  Integer.parseInt(canco_any_creacio), canco_interpret, Integer.parseInt(canco_durada));
-              labelErrorMod.setText("");
-              tableProductes.clearSelection();
-              filtrar();
-              JOptionPane.showConfirmDialog(null, "Canco Afegida Correctament", "Canco afegida!",
-                  JOptionPane.DEFAULT_OPTION,
-                  JOptionPane.INFORMATION_MESSAGE);
-              // wait for JOptionPane to close and then netejar() and return;
-              netejar();
-            } catch (PersistenciaException error) {
-              System.out.println(error.getMessage());
-              JOptionPane.showConfirmDialog(null, "Error afegir canço", "Error!", JOptionPane.DEFAULT_OPTION,
-                  JOptionPane.ERROR_MESSAGE);
-              labelErrorMod.setText("");
-              tableProductes.clearSelection();
-              buttonFiltrar.doClick();
-              netejar();
-            }
-          }
-        }
-      });
-      buttonCancelarMod.addMouseListener(new MouseAdapter() {
-        public void mouseClicked(MouseEvent e) {
-          netejar();
-          tableProductes.clearSelection();
-        }
-      });
-    } else if (cbTipusMod.getSelectedItem().equals("ALBUM")) {
-
-    } else if (cbTipusMod.getSelectedItem().equals("LLISTA")) {
-
-    } else {
-      netejar();
+      if (opcio == 0) {
+        afegirCanco();
+        cbTipusMod.setSelectedIndex(0);
+        afegint = false;
+      } else if (opcio == 1) {
+        afegirAlbum();
+        cbTipusMod.setSelectedIndex(1);
+        afegint = false;
+      } else if (opcio == 2) {
+        afegirLlista();
+        cbTipusMod.setSelectedIndex(2);
+        afegint = false;
+      } else if (opcio == -1) {
+        netejar();
+        afegint = false;
+      }
     }
   }
 
-  public void modificarCanco() {
+  public void afegirCanco() {
     // labelTitolModProductes.setVisible(true);
     // textIdHiddenMod.setVisible(false);
     labelTipusMod.setVisible(true);
@@ -1012,5 +995,243 @@ public class VistaProducte extends JPanel {
     buttonCancelarMod.setVisible(true);
     buttonGuardarMod.setVisible(true);
     labelErrorMod.setVisible(true);
+  }
+
+  public void afegirCancoButton() {
+    String errorAfegirCanco = "<html>";
+
+    String producte_titol = textTitolMod.getText();
+    String producte_estil = cbEstilMod.getSelectedItem().toString();
+    char producte_actiu;
+    if (rbSiActiuMod.isSelected()) {
+      producte_actiu = 'S';
+    } else {
+      producte_actiu = 'N';
+    }
+    char producte_tipus = 'C';
+    String canco_durada = textDuradaMod.getText();
+    String canco_any_creacio = textAnyCreacioMod.getText();
+    String canco_interpret = cbInterpretsMod.getSelectedItem().toString();
+
+    if (producte_titol.equals("") || producte_titol == null || producte_titol.isEmpty()
+        || producte_titol.length() > 100) {
+      errorAfegirCanco += "El titol no pot ser buit i tenir mes de 100 caracters.<br>";
+    }
+
+    if (canco_durada.equals("") || canco_durada == null || canco_durada.isEmpty()) {
+      errorAfegirCanco += "La durada no pot ser buida.<br>";
+    } else if (canco_durada.contains(".") || canco_durada.contains(",")) {
+      errorAfegirCanco += "La durada ha de ser un numero enter.<br>";
+    } else if (canco_durada.matches(".*[a-zA-Z]+.*")) {
+      errorAfegirCanco += "La durada ha de ser un numero enter.<br>";
+    } else if (Integer.parseInt(canco_durada) < 1 || Integer.parseInt(canco_durada) > 600) {
+      errorAfegirCanco += "La durada ha de ser un numero entre 1 i 600.<br>";
+    }
+
+    if (canco_any_creacio.equals("") || canco_any_creacio == null || canco_any_creacio.isEmpty()) {
+      errorAfegirCanco += "L'any de creacio no pot ser buit.<br>";
+    } else if (canco_any_creacio.contains(".") || canco_any_creacio.contains(",")) {
+      errorAfegirCanco += "L'any de creacio ha de ser un numero enter.<br>";
+    } else if (canco_any_creacio.matches(".*[a-zA-Z]+.*")) {
+      errorAfegirCanco += "L'any de creacio ha de ser un numero enter.<br>";
+    } else if (Integer.parseInt(canco_any_creacio) < 1900
+        || Integer.parseInt(canco_any_creacio) > 2022) {
+      errorAfegirCanco += "L'any de creacio ha de ser un numero entre 1900 i 2022.<br>";
+    }
+
+    errorAfegirCanco += "</html>";
+
+    if (!errorAfegirCanco.equals("<html></html>")) {
+      labelErrorMod.setVisible(true);
+      labelErrorMod.setText(errorAfegirCanco);
+    } else {
+      try {
+        DBProducte.insertCanco(producte_titol, producte_estil, producte_actiu, producte_tipus,
+            Integer.parseInt(canco_any_creacio), canco_interpret, Integer.parseInt(canco_durada));
+        labelErrorMod.setText("");
+        tableProductes.clearSelection();
+        filtrar();
+        JOptionPane.showConfirmDialog(null, "Canco Afegida Correctament", "Canco afegida!",
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.INFORMATION_MESSAGE);
+        // wait for JOptionPane to close and then netejar() and return;
+        netejar();
+      } catch (PersistenciaException error) {
+        System.out.println(error.getMessage());
+        labelErrorMod.setText("");
+        tableProductes.clearSelection();
+        filtrar();
+        netejar();
+      }
+    }
+  }
+
+  public void afegirAlbum() {
+    // labelTitolModProductes.setVisible(true);
+    // textIdHiddenMod.setVisible(false);
+    labelTipusMod.setVisible(true);
+    cbTipusMod.setVisible(true);
+    cbTipusMod.setEnabled(false);
+
+    labelTitolMod.setVisible(true);
+    textTitolMod.setVisible(true);
+    textTitolMod.setEnabled(true);
+    labelEstilMod.setVisible(true);
+    cbEstilMod.setVisible(true);
+    cbEstilMod.setEnabled(true);
+    labelActiuMod.setVisible(true);
+    rbSiActiuMod.setVisible(true);
+    rbSiActiuMod.setEnabled(true);
+    rbNoActiuMod.setVisible(true);
+    rbNoActiuMod.setEnabled(true);
+    labelDuradaMod.setVisible(false);
+    textDuradaMod.setVisible(false);
+    textDuradaMod.setEnabled(false);
+    labelAnyCreacioMod.setVisible(true);
+    textAnyCreacioMod.setVisible(true);
+    textAnyCreacioMod.setEnabled(true);
+    labelInterpretsMod.setVisible(false);
+    cbInterpretsMod.setVisible(false);
+    cbInterpretsMod.setEnabled(false);
+    buttonCancelarMod.setVisible(true);
+    buttonGuardarMod.setVisible(true);
+    labelErrorMod.setVisible(true);
+  }
+
+  public void afegirAlbumButton() {
+    String errorAfegirCanco = "<html>";
+
+    String producte_titol = textTitolMod.getText();
+    String producte_estil = cbEstilMod.getSelectedItem().toString();
+    char producte_actiu;
+    if (rbSiActiuMod.isSelected()) {
+      producte_actiu = 'S';
+    } else {
+      producte_actiu = 'N';
+    }
+    char producte_tipus = 'A';
+    String canco_any_creacio = textAnyCreacioMod.getText();
+
+    if (producte_titol.equals("") || producte_titol == null || producte_titol.isEmpty()
+        || producte_titol.length() > 100) {
+      errorAfegirCanco += "El titol no pot ser buit i tenir mes de 100 caracters.<br>";
+    }
+
+    if (canco_any_creacio.equals("") || canco_any_creacio == null || canco_any_creacio.isEmpty()) {
+      errorAfegirCanco += "L'any de creacio no pot ser buit.<br>";
+    } else if (canco_any_creacio.contains(".") || canco_any_creacio.contains(",")) {
+      errorAfegirCanco += "L'any de creacio ha de ser un numero enter.<br>";
+    } else if (canco_any_creacio.matches(".*[a-zA-Z]+.*")) {
+      errorAfegirCanco += "L'any de creacio ha de ser un numero enter.<br>";
+    } else if (Integer.parseInt(canco_any_creacio) < 1900
+        || Integer.parseInt(canco_any_creacio) > 2022) {
+      errorAfegirCanco += "L'any de creacio ha de ser un numero entre 1900 i 2022.<br>";
+    }
+
+    errorAfegirCanco += "</html>";
+
+    if (!errorAfegirCanco.equals("<html></html>")) {
+      labelErrorMod.setVisible(true);
+      labelErrorMod.setText(errorAfegirCanco);
+    } else {
+      try {
+        DBProducte.insertAlbum(producte_titol, producte_estil, producte_actiu, producte_tipus,
+            Integer.parseInt(canco_any_creacio));
+        labelErrorMod.setText("");
+        tableProductes.clearSelection();
+        filtrar();
+        JOptionPane.showConfirmDialog(null, "Album Afegit Correctament", "Album afegit!",
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.INFORMATION_MESSAGE);
+        // wait for JOptionPane to close and then netejar() and return;
+        netejar();
+      } catch (PersistenciaException error) {
+        System.out.println(error.getMessage());
+        labelErrorMod.setText("");
+        tableProductes.clearSelection();
+        filtrar();
+        netejar();
+      }
+    }
+  }
+
+  public void afegirLlista() {
+    // labelTitolModProductes.setVisible(true);
+    // textIdHiddenMod.setVisible(false);
+    labelTipusMod.setVisible(true);
+    cbTipusMod.setVisible(true);
+    cbTipusMod.setEnabled(false);
+
+    labelTitolMod.setVisible(true);
+    textTitolMod.setVisible(true);
+    textTitolMod.setEnabled(true);
+    labelEstilMod.setVisible(true);
+    cbEstilMod.setVisible(true);
+    cbEstilMod.setEnabled(true);
+    labelActiuMod.setVisible(true);
+    rbSiActiuMod.setVisible(true);
+    rbSiActiuMod.setEnabled(true);
+    rbNoActiuMod.setVisible(true);
+    rbNoActiuMod.setEnabled(true);
+    labelDuradaMod.setVisible(false);
+    textDuradaMod.setVisible(false);
+    textDuradaMod.setEnabled(false);
+    labelAnyCreacioMod.setVisible(false);
+    textAnyCreacioMod.setVisible(false);
+    textAnyCreacioMod.setEnabled(false);
+    labelInterpretsMod.setVisible(false);
+    cbInterpretsMod.setVisible(false);
+    cbInterpretsMod.setEnabled(false);
+    buttonCancelarMod.setVisible(true);
+    buttonGuardarMod.setVisible(true);
+    labelErrorMod.setVisible(true);
+  }
+
+  public void afegirLlistaButton() {
+    String errorAfegirCanco = "<html>";
+
+    String producte_titol = textTitolMod.getText();
+    String producte_estil = cbEstilMod.getSelectedItem().toString();
+    char producte_actiu;
+    if (rbSiActiuMod.isSelected()) {
+      producte_actiu = 'S';
+    } else {
+      producte_actiu = 'N';
+    }
+    char producte_tipus = 'L';
+
+    if (producte_titol.equals("") || producte_titol == null || producte_titol.isEmpty()
+        || producte_titol.length() > 100) {
+      errorAfegirCanco += "El titol no pot ser buit i tenir mes de 100 caracters.<br>";
+    }
+
+    errorAfegirCanco += "</html>";
+
+    if (!errorAfegirCanco.equals("<html></html>")) {
+      labelErrorMod.setVisible(true);
+      labelErrorMod.setText(errorAfegirCanco);
+    } else {
+      try {
+        DBProducte.insertLlista(producte_titol, producte_estil, producte_actiu, producte_tipus);
+        labelErrorMod.setText("");
+        tableProductes.clearSelection();
+        filtrar();
+        JOptionPane.showConfirmDialog(null, "Llista Afegida Correctament", "Llista afegida!",
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.INFORMATION_MESSAGE);
+        // wait for JOptionPane to close and then netejar() and return;
+        netejar();
+      } catch (PersistenciaException error) {
+        System.out.println(error.getMessage());
+        labelErrorMod.setText("");
+        tableProductes.clearSelection();
+        filtrar();
+        netejar();
+      }
+    }
+  }
+
+  public void modificar(){
+    
   }
 }
