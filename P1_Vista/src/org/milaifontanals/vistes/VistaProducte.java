@@ -465,7 +465,8 @@ public class VistaProducte extends JPanel {
         if (tableProductes.getSelectedRowCount() > 1) {
           JOptionPane.showConfirmDialog(null, "Selecciona un únic producte", "Error", JOptionPane.DEFAULT_OPTION,
               JOptionPane.ERROR_MESSAGE);
-          buttonNetejar.doClick();
+          netejar();
+          tableProductes.clearSelection();
         } else {
           veure();
           buttonModificar.setEnabled(true);
@@ -512,14 +513,14 @@ public class VistaProducte extends JPanel {
             if (buttonAfegir.isEnabled()) {
               afegirAlbumButton();
             } else if (buttonAfegir.isEnabled() == false && buttonModificar.isEnabled() == false) {
-              // modificarAlbumButton();
+              modificarAlbumButton();
             }
             break;
           case "LLISTA":
             if (buttonAfegir.isEnabled()) {
               afegirLlistaButton();
             } else if (buttonAfegir.isEnabled() == false && buttonModificar.isEnabled() == false) {
-              // modificarLlista(Button);
+              modificarLlistaButton();
             }
             break;
         }
@@ -535,6 +536,108 @@ public class VistaProducte extends JPanel {
     buttonModificar.addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent e) {
         modificar();
+      }
+    });
+    buttonAfegirAlbumOLlista.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent e) {
+        String tipus = cbTipusMod.getSelectedItem().toString();
+        String producte_titol = tableProductes.getValueAt(tableProductes.getSelectedRow(), 0).toString();
+        int id = (int) getId(producte_titol);
+
+        if (tipus.equals("ALBUM")) {
+          int posicio[] = new int[tableAlbumOLlista.getRowCount()];
+          int posicioDisponible = 0;
+
+          for (int i = 0; i < tableAlbumOLlista.getRowCount(); i++) {
+            posicio[i] = (int) tableAlbumOLlista.getValueAt(i, 2);
+          }
+
+          for (int i = 0; i < posicio.length; i++) {
+            if (posicio[i] != i + 1) {
+              posicioDisponible = i + 1;
+              break;
+            } else {
+              posicioDisponible = posicio.length + 1;
+            }
+          }
+
+          if (cbDisponibles.getItemCount() == 0) {
+            JOptionPane.showConfirmDialog(null, "No hi ha cançons disponibles", "Error", JOptionPane.DEFAULT_OPTION,
+                JOptionPane.ERROR_MESSAGE);
+          } else {
+            String cancoSeleccionada = cbDisponibles.getSelectedItem().toString();
+            try {
+              DBProducte.insertCancoAlbum(id, cancoSeleccionada, posicioDisponible);
+              reiniciarAlbumContingut(id);
+            } catch (PersistenciaException e1) {
+              System.out.println("Error al afegir cançó a l'àlbum.\n" + e1.getMessage());
+            }
+          }
+        } else if (tipus.equals("LLISTA")) {
+          int posicion[] = new int[tableAlbumOLlista.getRowCount()];
+          int posicionDisponible = 0;
+
+          for (int i = 0; i < tableAlbumOLlista.getRowCount(); i++) {
+            posicion[i] = (int) tableAlbumOLlista.getValueAt(i, 2);
+          }
+
+          for (int i = 0; i < posicion.length; i++) {
+            if (posicion[i] != i + 1) {
+              posicionDisponible = i + 1;
+              break;
+            } else {
+              posicionDisponible = posicion.length + 1;
+            }
+          }
+
+          if (cbDisponibles.getItemCount() == 0) {
+            JOptionPane.showConfirmDialog(null, "No hi ha productes disponibles", "Error", JOptionPane.DEFAULT_OPTION,
+                JOptionPane.ERROR_MESSAGE);
+          } else {
+            String cancoSeleccionada = cbDisponibles.getSelectedItem().toString();
+            try {
+              DBProducte.insertProducteLlista(id, cancoSeleccionada, posicionDisponible);
+              reiniciarLlistaContingut(id);
+            } catch (PersistenciaException e1) {
+              System.out.println("Error al afegir producte a la llista.\n" + e1.getMessage());
+            }
+          }
+        }
+      }
+    });
+    buttonEliminarAlbumOLlista.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent e) {
+        String tipus = cbTipusMod.getSelectedItem().toString();
+        String producte_titol = tableProductes.getValueAt(tableProductes.getSelectedRow(), 0).toString();
+        int id = (int) getId(producte_titol);
+
+        if (tipus.equals("ALBUM")) {
+          if (cbNoDisponibles.getItemCount() == 1) {
+            JOptionPane.showConfirmDialog(null, "El album no te cap canço", "Error", JOptionPane.DEFAULT_OPTION,
+                JOptionPane.ERROR_MESSAGE);
+          } else {
+            String cancion_selecionada = cbNoDisponibles.getSelectedItem().toString();
+            try {
+              DBProducte.deleteCancoAlbum(id, cancion_selecionada);
+              reiniciarAlbumContingut(id);
+            } catch (PersistenciaException e1) {
+              System.out.println("Error al eliminar cançó de l'àlbum.\n" + e1.getMessage());
+            }
+          }
+        } else if (tipus.equals("LLISTA")) {
+          if (cbNoDisponibles.getItemCount() == 1) {
+            JOptionPane.showConfirmDialog(null, "La llista no te cap canço", "Error", JOptionPane.DEFAULT_OPTION,
+                JOptionPane.ERROR_MESSAGE);
+          } else {
+            String cancion_selecionada = cbNoDisponibles.getSelectedItem().toString();
+            try {
+              DBProducte.deleteProducteLlista(id, cancion_selecionada);
+              reiniciarLlistaContingut(id);
+            } catch (PersistenciaException e1) {
+              System.out.println("Error al eliminar producte de la llista.\n" + e1.getMessage());
+            }
+          }
+        }
       }
     });
   }
@@ -1241,8 +1344,57 @@ public class VistaProducte extends JPanel {
         afegirCanco();
       } else if (tipus == "ALBUM") {
         afegirAlbum();
+        tableAlbumOLlista.setVisible(true);
+        scrollAlbumOLlista.setVisible(true);
+        labelDisponibles.setVisible(true);
+        cbDisponibles.setVisible(true);
+        buttonAfegirAlbumOLlista.setVisible(true);
+        labelNoDisponibles.setVisible(true);
+        cbNoDisponibles.setVisible(true);
+        buttonEliminarAlbumOLlista.setVisible(true);
+        labelDuradaMod.setVisible(true);
+        textDuradaMod.setVisible(true);
+        textDuradaMod.setEnabled(false);
+        try {
+          int producte_id = (int) id;
+          List<Producte> canconsDisponibles = DBProducte.getCanconsDisponibles();
+          for (Producte canco : canconsDisponibles) {
+            cbDisponibles.addItem(canco.getProducte_titol());
+          }
+          List<Producte> canconsAlbum = DBProducte.getCanconsAlbum(producte_id);
+          for (Producte canco : canconsAlbum) {
+            cbNoDisponibles.addItem(canco.getProducte_titol());
+          }
+        } catch (PersistenciaException error) {
+          System.out.println(error.getMessage());
+        }
       } else if (tipus == "LLISTA") {
         afegirLlista();
+        tableAlbumOLlista.setVisible(true);
+        scrollAlbumOLlista.setVisible(true);
+        labelDisponibles.setVisible(true);
+        cbDisponibles.setVisible(true);
+        buttonAfegirAlbumOLlista.setVisible(true);
+        labelNoDisponibles.setVisible(true);
+        cbNoDisponibles.setVisible(true);
+        buttonEliminarAlbumOLlista.setVisible(true);
+        labelDuradaMod.setVisible(true);
+        textDuradaMod.setVisible(true);
+        textDuradaMod.setEnabled(false);
+        try {
+          int producte_id = (int) id;
+          List<Producte> canconsDisponibles = DBProducte.getProductesDisponiblesLlista();
+          for (Producte canco : canconsDisponibles) {
+            cbDisponibles.addItem(canco.getProducte_titol());
+          }
+          List<Producte> canconsAlbum = DBProducte
+              .getProductesEnLlista(producte_id);
+          for (Producte canco : canconsAlbum) {
+            cbNoDisponibles.addItem(canco.getProducte_titol());
+          }
+        } catch (PersistenciaException error) {
+          System.out.println(error.getMessage());
+        }
       }
       buttonAfegir.setEnabled(false);
     }
@@ -1317,6 +1469,182 @@ public class VistaProducte extends JPanel {
         filtrar();
         netejar();
       }
+    }
+  }
+
+  public void modificarAlbumButton() {
+    String errorAfegirCanco = "<html>";
+    String titol_anterior = tableProductes.getValueAt(tableProductes.getSelectedRow(), 0).toString();
+
+    String producte_titol = textTitolMod.getText();
+    String producte_estil = cbEstilMod.getSelectedItem().toString();
+    char producte_actiu;
+    if (rbSiActiuMod.isSelected()) {
+      producte_actiu = 'S';
+    } else {
+      producte_actiu = 'N';
+    }
+    String canco_any_creacio = textAnyCreacioMod.getText();
+    long producte_id = getId(titol_anterior);
+    int producte_id_int = (int) producte_id;
+
+    if (producte_titol.equals("") || producte_titol == null || producte_titol.isEmpty()
+        || producte_titol.length() > 100) {
+      errorAfegirCanco += "El titol no pot ser buit i tenir mes de 100 caracters.<br>";
+    }
+
+    if (canco_any_creacio.equals("") || canco_any_creacio == null || canco_any_creacio.isEmpty()) {
+      errorAfegirCanco += "L'any de creacio no pot ser buit.<br>";
+    } else if (canco_any_creacio.contains(".") || canco_any_creacio.contains(",")) {
+      errorAfegirCanco += "L'any de creacio ha de ser un numero enter.<br>";
+    } else if (canco_any_creacio.matches(".*[a-zA-Z]+.*")) {
+      errorAfegirCanco += "L'any de creacio ha de ser un numero enter.<br>";
+    } else if (Integer.parseInt(canco_any_creacio) < 1900
+        || Integer.parseInt(canco_any_creacio) > 2022) {
+      errorAfegirCanco += "L'any de creacio ha de ser un numero entre 1900 i 2022.<br>";
+    }
+
+    errorAfegirCanco += "</html>";
+
+    if (!errorAfegirCanco.equals("<html></html>")) {
+      labelErrorMod.setVisible(true);
+      labelErrorMod.setText(errorAfegirCanco);
+    } else {
+      try {
+        DBProducte.updateAlbum(producte_id_int, producte_titol, producte_estil, producte_actiu,
+            Integer.parseInt(canco_any_creacio));
+        labelErrorMod.setText("");
+        tableProductes.clearSelection();
+        filtrar();
+        JOptionPane.showConfirmDialog(null, "Album Modificat Correctament", "Album modificat!",
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.INFORMATION_MESSAGE);
+        // wait for JOptionPane to close and then netejar() and return;
+        netejar();
+      } catch (PersistenciaException error) {
+        System.out.println(error.getMessage());
+        labelErrorMod.setText("");
+        tableProductes.clearSelection();
+        filtrar();
+        netejar();
+      }
+    }
+  }
+
+  public void reiniciarAlbumContingut(int producte_id) {
+    try {
+      modelAlbumOLlista.setRowCount(0);
+      modelAlbumOLlista.setColumnCount(0);
+      modelAlbumOLlista.addColumn("Cançó");
+      modelAlbumOLlista.addColumn("Durada");
+      modelAlbumOLlista.addColumn("Posicio");
+
+      List<Album> albumsCancons = DBProducte.getAlbumCancons(producte_id);
+      for (Album ac : albumsCancons) {
+        Iterator<Canco> it = ac.getCancons();
+        while (it.hasNext()) {
+          Canco c = it.next();
+          modelAlbumOLlista.addRow(new Object[] { c.getProducte_titol(), c.getDurada(),
+              ac.getPosicio() });
+        }
+      }
+      tableAlbumOLlista.setModel(modelAlbumOLlista);
+
+      cbDisponibles.removeAllItems();
+      cbNoDisponibles.removeAllItems();
+
+      List<Producte> canconsDisponibles = DBProducte.getCanconsDisponibles();
+      for (Producte canco : canconsDisponibles) {
+        cbDisponibles.addItem(canco.getProducte_titol());
+      }
+      List<Producte> canconsAlbum = DBProducte.getCanconsAlbum(producte_id);
+      for (Producte canco : canconsAlbum) {
+        cbNoDisponibles.addItem(canco.getProducte_titol());
+      }
+    } catch (PersistenciaException error) {
+      System.out.println(error.getMessage());
+    }
+  }
+
+  public void modificarLlistaButton() {
+    String errorAfegirCanco = "<html>";
+    String titol_anterior = tableProductes.getValueAt(tableProductes.getSelectedRow(), 0).toString();
+
+    String producte_titol = textTitolMod.getText();
+    String producte_estil = cbEstilMod.getSelectedItem().toString();
+    char producte_actiu;
+    if (rbSiActiuMod.isSelected()) {
+      producte_actiu = 'S';
+    } else {
+      producte_actiu = 'N';
+    }
+
+    long producte_id = getId(titol_anterior);
+    int producte_id_int = (int) producte_id;
+
+    if (producte_titol.equals("") || producte_titol == null || producte_titol.isEmpty()
+        || producte_titol.length() > 100) {
+      errorAfegirCanco += "El titol no pot ser buit i tenir mes de 100 caracters.<br>";
+    }
+
+    errorAfegirCanco += "</html>";
+
+    if (!errorAfegirCanco.equals("<html></html>")) {
+      labelErrorMod.setVisible(true);
+      labelErrorMod.setText(errorAfegirCanco);
+    } else {
+      try {
+        DBProducte.updateLlista(producte_id_int, producte_titol, producte_estil, producte_actiu);
+        labelErrorMod.setText("");
+        tableProductes.clearSelection();
+        filtrar();
+        JOptionPane.showConfirmDialog(null, "Llista Modificada Correctament", "Llista modificada!",
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.INFORMATION_MESSAGE);
+        // wait for JOptionPane to close and then netejar() and return;
+        netejar();
+      } catch (PersistenciaException error) {
+        System.out.println(error.getMessage());
+        labelErrorMod.setText("");
+        tableProductes.clearSelection();
+        filtrar();
+        netejar();
+      }
+    }
+  }
+
+  public void reiniciarLlistaContingut(int producte_id) {
+    try {
+      cbDisponibles.removeAllItems();
+      cbNoDisponibles.removeAllItems();
+
+      List<Producte> canconsDisponibles = DBProducte.getProductesDisponiblesLlista();
+      for (Producte canco : canconsDisponibles) {
+        cbDisponibles.addItem(canco.getProducte_titol());
+      }
+      List<Producte> canconsAlbum = DBProducte
+          .getProductesEnLlista(producte_id);
+      for (Producte canco : canconsAlbum) {
+        cbNoDisponibles.addItem(canco.getProducte_titol());
+      }
+
+      modelAlbumOLlista.setRowCount(0);
+      modelAlbumOLlista.setColumnCount(0);
+      modelAlbumOLlista.addColumn("Producte");
+      modelAlbumOLlista.addColumn("Tipus");
+      modelAlbumOLlista.addColumn("Posicio");
+
+      List<ItemsLlista> items = DBProducte
+          .getLlistaProductes(producte_id);
+      for (ItemsLlista i : items) {
+        modelAlbumOLlista
+            .addRow(
+                new Object[] { i.getProducte().getProducte_titol(), i.getProducte().getProducte_tipus(),
+                    i.getLlista_posicio() });
+      }
+      tableAlbumOLlista.setModel(modelAlbumOLlista);
+    } catch (PersistenciaException error) {
+      System.out.println(error.getMessage());
     }
   }
 }
