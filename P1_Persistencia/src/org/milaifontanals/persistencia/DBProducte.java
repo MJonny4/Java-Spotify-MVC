@@ -783,4 +783,102 @@ public class DBProducte {
       }
     }
   }
+
+  public static boolean cancoInsideAlbumOrLlista(int canco_id) throws PersistenciaException {
+    PreparedStatement albums = null;
+    PreparedStatement llistes = null;
+    PreparedStatement albumCanco = null;
+    PreparedStatement llistaCanco = null;
+
+    try {
+      String sqlAlbums = "SELECT album_con_id_album FROM ALBUM_CONTINGUT WHERE album_con_id_canco = ?";
+      albums = Persistencia.getConnection().prepareStatement(sqlAlbums);
+      albums.setInt(1, canco_id);
+      ResultSet rsAlbums = albums.executeQuery();
+      while (rsAlbums.next()) {
+        return true;
+      }
+
+      String sqlLlistes = "SELECT llista_con_id_llista FROM LLISTA_CONTINGUT WHERE llista_con_id_producte = ?";
+      llistes = Persistencia.getConnection().prepareStatement(sqlLlistes);
+      llistes.setInt(1, canco_id);
+      ResultSet rsLlistes = llistes.executeQuery();
+      while (rsLlistes.next()) {
+        return true;
+      }
+
+      String sqlAlbumCanco = "SELECT album_con_id_canco FROM ALBUM_CONTINGUT WHERE album_con_id_canco = ?";
+      albumCanco = Persistencia.getConnection().prepareStatement(sqlAlbumCanco);
+      albumCanco.setInt(1, canco_id);
+      ResultSet rsAlbumCanco = albumCanco.executeQuery();
+      while (rsAlbumCanco.next()) {
+        return true;
+      }
+
+      String sqlLlistaCanco = "SELECT llista_con_id_producte FROM LLISTA_CONTINGUT WHERE llista_con_id_producte = ?";
+      llistaCanco = Persistencia.getConnection().prepareStatement(sqlLlistaCanco);
+      llistaCanco.setInt(1, canco_id);
+      ResultSet rsLlistaCanco = llistaCanco.executeQuery();
+      while (rsLlistaCanco.next()) {
+        return true;
+      }
+
+      return false;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      throw new PersistenciaException(
+          "Error al comprovar si la canço està dins d'un album o llista.\n" + e.getMessage());
+    } finally {
+      if (albums != null) {
+        try {
+          albums.close();
+        } catch (SQLException e) {
+          e.printStackTrace();
+          throw new PersistenciaException(
+              "Error en tancar la consulta per a comprovar si la canço està dins d'un album o llista.\n"
+                  + e.getMessage());
+        }
+      }
+    }
+  }
+
+  public static boolean contingutAlbumOrLlista(int producte_id) throws PersistenciaException {
+    PreparedStatement album = null;
+    PreparedStatement llista = null;
+
+    try {
+      String sqlAlbum = "SELECT album_con_id_canco FROM ALBUM_CONTINGUT WHERE album_con_id_album = ?";
+      album = Persistencia.getConnection().prepareStatement(sqlAlbum);
+      album.setInt(1, producte_id);
+      ResultSet rsAlbum = album.executeQuery();
+      while (rsAlbum.next()) {
+        return true;
+      }
+
+      String sqlLlista = "SELECT llista_con_id_producte FROM LLISTA_CONTINGUT WHERE llista_con_id_llista = ?";
+      llista = Persistencia.getConnection().prepareStatement(sqlLlista);
+      llista.setInt(1, producte_id);
+      ResultSet rsLlista = llista.executeQuery();
+      while (rsLlista.next()) {
+        return true;
+      }
+
+      return false;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      throw new PersistenciaException(
+          "Error al comprovar si l'album o llista té contingut.\n" + e.getMessage());
+    } finally {
+      if (album != null) {
+        try {
+          album.close();
+        } catch (SQLException e) {
+          e.printStackTrace();
+          throw new PersistenciaException(
+              "Error en tancar la consulta per a comprovar si l'album o llista té contingut.\n"
+                  + e.getMessage());
+        }
+      }
+    }
+  }
 }

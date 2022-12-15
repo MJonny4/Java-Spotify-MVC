@@ -182,3 +182,13 @@ CREATE TABLE REPRODUCCIO ( -- GOOD
   CONSTRAINT fk_reproduccio_client FOREIGN KEY (rep_id_client) REFERENCES CLIENT (client_id),
   CONSTRAINT fk_reproduccio_producte FOREIGN KEY (rep_id_producte) REFERENCES PRODUCTE (producte_id)
 );
+
+-- OPCIONAL
+CREATE OR REPLACE TRIGGER delete_producte_cascade
+  BEFORE DELETE ON PRODUCTE
+  FOR EACH ROW
+BEGIN
+  DELETE FROM CANCO WHERE canco_id = :OLD.producte_id;
+  DELETE FROM ALBUM WHERE album_id = :OLD.producte_id;
+  DELETE FROM LLISTA WHERE llista_id = :OLD.producte_id;
+END;

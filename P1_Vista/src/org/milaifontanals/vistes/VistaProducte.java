@@ -640,6 +640,88 @@ public class VistaProducte extends JPanel {
         }
       }
     });
+    buttonEliminar.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent evento) {
+        int row = tableProductes.getSelectedRow();
+        String titol = tableProductes.getValueAt(row, 0).toString();
+        if (row == -1 || row == 0) {
+          JOptionPane.showConfirmDialog(null, "No has seleccionat cap producte", "Error", JOptionPane.DEFAULT_OPTION,
+              JOptionPane.ERROR_MESSAGE);
+        } else {
+          long producte_id = getId(titol);
+          String tipus = tableProductes.getValueAt(row, 2).toString();
+          int confirmacio = JOptionPane.showConfirmDialog(null, "Estas segur que vols eliminar el producte?",
+              "Confirmació", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+          if (confirmacio == 0) {
+            if (tipus.equals("CANCO")) {
+              boolean NoEliminable = false;
+              try {
+                NoEliminable = DBProducte.cancoInsideAlbumOrLlista((int) producte_id);
+              } catch (PersistenciaException e) {
+                System.out.println("Error al eliminar cançó.\n" + e.getMessage());
+              }
+
+              if (NoEliminable == true) {
+                JOptionPane.showConfirmDialog(null, "No pots eliminar la cançó perque esta dins d'un album o llista",
+                    "Error", JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.ERROR_MESSAGE);
+              } else {
+                try {
+                  DBProducte.deleteProducte((int) producte_id);
+                  netejar();
+                  filtrar();
+                } catch (PersistenciaException e) {
+                  System.out.println("Error al eliminar cançó.\n" + e.getMessage());
+                }
+              }
+            } else if (tipus.equals("ALBUM")) {
+              boolean NoEliminable = false;
+              try {
+                NoEliminable = DBProducte.contingutAlbumOrLlista((int) producte_id);
+              } catch (PersistenciaException e) {
+                System.out.println("Error al eliminar album.\n" + e.getMessage());
+              }
+              if (NoEliminable == true) {
+                JOptionPane.showConfirmDialog(null, "No pots eliminar l'àlbum perque te contingut", "Error",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.ERROR_MESSAGE);
+              } else {
+                try {
+                  DBProducte.deleteProducte((int) producte_id);
+                  netejar();
+                  filtrar();
+                } catch (PersistenciaException e) {
+                  System.out.println("Error al eliminar album.\n" + e.getMessage());
+                }
+              }
+            } else if (tipus.equals("LLISTA")) {
+              boolean NoEliminable = false;
+              try {
+                NoEliminable = DBProducte.contingutAlbumOrLlista((int) producte_id);
+              } catch (PersistenciaException e) {
+                System.out.println("Error al eliminar llista.\n" + e.getMessage());
+              }
+              if (NoEliminable == true) {
+                JOptionPane.showConfirmDialog(null, "No pots eliminar la llista perque te contingut", "Error",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.ERROR_MESSAGE);
+              } else {
+                try {
+                  DBProducte.deleteProducte((int) producte_id);
+                  netejar();
+                  filtrar();
+                } catch (PersistenciaException e) {
+                  System.out.println("Error al eliminar llista.\n" + e.getMessage());
+                }
+              }
+            }
+          } else {
+            netejar();
+            filtrar();
+          }
+        }
+      }
+    });
   }
 
   public VistaProducte() {
