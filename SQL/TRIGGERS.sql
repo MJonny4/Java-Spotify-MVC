@@ -119,7 +119,8 @@ CREATE OR REPLACE TRIGGER trigger_delete_producte
 DECLARE
   rep_count number;
 BEGIN
-  SELECT COUNT(*) INTO rep_count FROM PRODUCTE where :old.producte_id IN (SELECT rep_id_producte FROM REPRODUCCIO);
+    -- MODIFICAR EN ARCHIVO
+  SELECT COUNT(*) INTO rep_count FROM reproduccio where rep_id_producte = :old.producte_id;
   IF (rep_count > 0) THEN
     RAISE_APPLICATION_ERROR(-20011, 'No es pot esborrar un producte que ha estat reproduit!');
   END IF;
