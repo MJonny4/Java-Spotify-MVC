@@ -569,6 +569,7 @@ public class VistaProducte extends JPanel {
             try {
               DBProducte.insertCancoAlbum(id, cancoSeleccionada, posicioDisponible);
               reiniciarAlbumContingut(id);
+              updateDuaradaLlistaOAlbum(id, tipus);
             } catch (PersistenciaException e1) {
               System.out.println("Error al afegir cançó a l'àlbum.\n" + e1.getMessage());
             }
@@ -598,6 +599,7 @@ public class VistaProducte extends JPanel {
             try {
               DBProducte.insertProducteLlista(id, cancoSeleccionada, posicionDisponible);
               reiniciarLlistaContingut(id);
+              updateDuaradaLlistaOAlbum(id, tipus);
             } catch (PersistenciaException e1) {
               System.out.println("Error al afegir producte a la llista.\n" + e1.getMessage());
             }
@@ -620,6 +622,7 @@ public class VistaProducte extends JPanel {
             try {
               DBProducte.deleteCancoAlbum(id, cancion_selecionada);
               reiniciarAlbumContingut(id);
+              updateDuaradaLlistaOAlbum(id, tipus);
             } catch (PersistenciaException e1) {
               System.out.println("Error al eliminar cançó de l'àlbum.\n" + e1.getMessage());
             }
@@ -633,6 +636,7 @@ public class VistaProducte extends JPanel {
             try {
               DBProducte.deleteProducteLlista(id, cancion_selecionada);
               reiniciarLlistaContingut(id);
+              updateDuaradaLlistaOAlbum(id, tipus);
             } catch (PersistenciaException e1) {
               System.out.println("Error al eliminar producte de la llista.\n" + e1.getMessage());
             }
@@ -740,6 +744,7 @@ public class VistaProducte extends JPanel {
     cbLlistaFiltra.setSelected(true);
 
     filtrar();
+    commitOrRollback();
   }
 
   public void Connexio() {
@@ -1729,4 +1734,76 @@ public class VistaProducte extends JPanel {
       System.out.println(error.getMessage());
     }
   }
+
+  public void updateDuaradaLlistaOAlbum(int producte_id, String producte_tipus) {
+    try {
+      int novaDuarda = DBProducte.getDuaradaAlbumOLlista(producte_id, producte_tipus);
+      textDuradaMod.setText(String.valueOf(novaDuarda));
+    } catch (PersistenciaException error) {
+      System.out.println(error.getMessage());
+    }
+  }
+
+  // ! PART DE COMMIT Y ROLLBACK
+  public void commitOrRollback() {
+    commit.setBounds(200, 600, 100, 30);
+    rollback.setBounds(400, 600, 100, 30);
+    this.add(commit);
+    this.add(rollback);
+
+    commit.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        commit();
+        commit.setEnabled(false);
+        rollback.setEnabled(false);
+      }
+    });
+
+    rollback.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        rollback();
+        commit.setEnabled(false);
+        rollback.setEnabled(false);
+      }
+    });
+  }
+
+  public void commit() {
+    try {
+      Persistencia.commit();
+      JOptionPane.showConfirmDialog(null, "Commit Realitzat Correctament", "Commit Realitzat!",
+          JOptionPane.DEFAULT_OPTION,
+          JOptionPane.INFORMATION_MESSAGE);
+      // wait for JOptionPane to close and then netejar() and return;
+      netejar();
+    } catch (PersistenciaException error) {
+      System.out.println(error.getMessage());
+      labelErrorMod.setText("");
+      tableProductes.clearSelection();
+      filtrar();
+      netejar();
+    }
+  }
+
+  public void rollback() {
+    try {
+      Persistencia.rollback();
+      JOptionPane.showConfirmDialog(null, "Rollback Realitzat Correctament", "Rollback Realitzat!",
+          JOptionPane.DEFAULT_OPTION,
+          JOptionPane.INFORMATION_MESSAGE);
+      // wait for JOptionPane to close and then netejar() and return;
+      netejar();
+    } catch (PersistenciaException error) {
+      System.out.println(error.getMessage());
+      labelErrorMod.setText("");
+      tableProductes.clearSelection();
+      filtrar();
+      netejar();
+    }
+  }
+
+  JButton commit = new JButton("Commit");
+  JButton rollback = new JButton("Rollback");
 }

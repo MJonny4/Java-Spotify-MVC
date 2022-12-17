@@ -7,26 +7,55 @@ package org.milaifontanals.vistes;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-
+import org.milaifontanals.persistencia.Persistencia;
+import org.milaifontanals.persistencia.PersistenciaException;
 
 /**
  *
  * @author Ion
  */
 public class VistaPrincipal extends JFrame {
-    
-    public VistaPrincipal() {
-        initComponents();
-    }
-    
-    private void initComponents() {
+
+  public VistaPrincipal() {
+    initComponents();
+    addWindowListener(new WindowAdapter() {
+      public void windowClosing(WindowEvent e) {
+        int confirmacio = JOptionPane.showConfirmDialog(null, "Vols fer COMMIT?", "Confirmació",
+            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (confirmacio == 0) {
+          try {
+            Persistencia.commit();
+          } catch (PersistenciaException e1) {
+            System.out.println("Error al fer commit.\n" + e1.getMessage());
+          }
+        } else if (confirmacio == 1) {
+          try {
+            Persistencia.rollback();
+          } catch (PersistenciaException e1) {
+            System.out.println("Error al fer rollback.\n" + e1.getMessage());
+          }
+        } else {
+          try {
+            Persistencia.close();
+          } catch (PersistenciaException e1) {
+            System.out.println("Error al tancar la connexió.\n" + e1.getMessage());
+          }
+        }
+      }
+    });
+  }
+
+  private void initComponents() {
     setTitle("Mila Spotify");
     setSize(1900, 900);
     setLocationRelativeTo(null);
@@ -175,5 +204,5 @@ public class VistaPrincipal extends JFrame {
       }
     });
   }
-    
+
 }

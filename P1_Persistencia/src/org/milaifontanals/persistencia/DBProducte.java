@@ -881,4 +881,56 @@ public class DBProducte {
       }
     }
   }
+
+  public static int getDuaradaAlbumOLlista(int producte_id, String producte_tipus) throws PersistenciaException {
+    PreparedStatement ps = null;
+    if (producte_tipus.equals("ALBUM")){
+      try {
+        String sql = "SELECT album_durada FROM ALBUM WHERE album_id = ?";
+        ps = Persistencia.getConnection().prepareStatement(sql);
+        ps.setInt(1, producte_id);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+          return rs.getInt("album_durada");
+        }
+      } catch (SQLException e) {
+        e.printStackTrace();
+        throw new PersistenciaException("Error al obtenir la durada de l'album.\n" + e.getMessage());
+      } finally {
+        if (ps != null) {
+          try {
+            ps.close();
+          } catch (SQLException e) {
+            e.printStackTrace();
+            throw new PersistenciaException(
+                "Error en tancar la consulta per a obtenir la durada de l'album.\n" + e.getMessage());
+          }
+        }
+      }
+    } else if (producte_tipus.equals("LLISTA")){
+      try {
+        String sql = "SELECT llista_durada FROM LLISTA WHERE llista_id = ?";
+        ps = Persistencia.getConnection().prepareStatement(sql);
+        ps.setInt(1, producte_id);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+          return rs.getInt("llista_durada");
+        }
+      } catch (SQLException e) {
+        e.printStackTrace();
+        throw new PersistenciaException("Error al obtenir la durada de la llista.\n" + e.getMessage());
+      } finally {
+        if (ps != null) {
+          try {
+            ps.close();
+          } catch (SQLException e) {
+            e.printStackTrace();
+            throw new PersistenciaException(
+                "Error en tancar la consulta per a obtenir la durada de la llista.\n" + e.getMessage());
+          }
+        }
+      }
+    }
+    return 0;
+  }
 }
