@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reproduccionsProductes" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9c61e8a3-dedc-4aa7-90c2-d2c7806cb359">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="ionProducteID" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT p.producte_titol, e.estil_nom, p.producte_actiu, p.producte_tipus,
+c.canco_any_creacio, c.canco_durada, a.artista_nom, cli.client_nom, cli.client_cognoms , re.rep_moment_temporal
+FROM producte p
+INNER JOIN canco c ON p.producte_id = c.CANCO_ID
+INNER JOIN estil e ON p.PRODUCTE_ESTIL = e.ESTIL_ID
+INNER JOIN artista a ON a.artista_id = c.CANCO_INTERPET
+INNER JOIN REPRODUCCIO re ON re.REP_ID_PRODUCTE = p.producte_id
+INNER JOIN client cli ON cli.CLIENT_ID = re.rep_id_client
+INNER JOIN REPRODUCCIO re ON p.producte_id = re.REP_ID_PRODUCTE
+AND p.producte_id = $P{ionProducteID}]]>
+	</queryString>
+	<field name="PRODUCTE_TITOL" class="java.lang.String"/>
+	<field name="ESTIL_NOM" class="java.lang.String"/>
+	<field name="PRODUCTE_ACTIU" class="java.lang.String"/>
+	<field name="PRODUCTE_TIPUS" class="java.lang.String"/>
+	<field name="CANCO_ANY_CREACIO" class="java.math.BigDecimal"/>
+	<field name="CANCO_DURADA" class="java.math.BigDecimal"/>
+	<field name="ARTISTA_NOM" class="java.lang.String"/>
+	<field name="CLIENT_NOM" class="java.lang.String"/>
+	<field name="CLIENT_COGNOMS" class="java.lang.String"/>
+	<field name="REP_MOMENT_TEMPORAL" class="java.sql.Timestamp"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="d9392a05-429b-4459-bd21-59761d1076ed" x="0" y="0" width="555" height="79"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="26"/>
+				</textElement>
+				<text><![CDATA[REPRODUCCIONS DEL PRODUCTE]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="135" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="65c1afe9-c3b3-413f-b3e2-48ba12a39285" x="0" y="14" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Producte]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="74822d1c-f2e1-4ca2-876d-6f65da0c1779" x="100" y="14" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{PRODUCTE_TITOL}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="acc48ec5-8eba-4a68-8496-3ccfb2a6f476" x="0" y="34" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Estil]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="12556534-7d34-4379-bc16-8ff26c2d2819" x="100" y="34" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{ESTIL_NOM}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="d2a1c8c8-bd8e-4a69-a20c-f0e4cef8cd3e" x="0" y="54" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Actiu]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="a1af93a1-0069-4df4-b5dc-10959050c212" x="100" y="54" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{PRODUCTE_ACTIU}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="e629b13e-346a-45a9-9d43-9adbca49fff2" x="0" y="74" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Tipus]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="b647b384-39a6-4d65-92fb-5556d5816d47" x="100" y="74" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{PRODUCTE_TIPUS}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="56820eb4-3358-4ad4-97ca-c3e53315e6f9" x="355" y="14" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Artista]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="a4a3a0cc-5409-4fde-b3ee-a4601d75adf5" x="455" y="14" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{ARTISTA_NOM}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="5a62dcd1-0286-42af-9698-7cf62e8dba60" x="355" y="34" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Any Creacio]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="f4ecce22-c273-49bf-911a-08e4d342d8cc" x="455" y="34" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{CANCO_ANY_CREACIO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="b68537a7-00ff-4362-9d2b-5d1740b4804f" x="355" y="54" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Durada]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="8b55d7ee-d009-40f3-b4ff-f4cdabb81519" x="455" y="54" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{CANCO_DURADA}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="760d1dc0-7c2e-4b93-bd0f-7eaddf8e7fc6" x="25" y="41" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Moment]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f15f9c1a-3bf5-4660-9349-3757aa02a1e2" x="273" y="41" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Nom]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c30c3a17-af5e-45c0-bafa-0af4e64b1393" x="373" y="41" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Cognoms]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<textField>
+				<reportElement uuid="5c7ca71b-4a9b-4d1c-8669-d5871b7882b1" x="25" y="1" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{REP_MOMENT_TEMPORAL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="81a8cda3-c234-4041-b910-b10c786e5ace" x="273" y="1" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{CLIENT_NOM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="a1fd29d6-4d45-4c35-8e89-c516f4a00424" x="373" y="1" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{CLIENT_COGNOMS}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="84733c3d-babf-4fba-bdba-8abb67fd6d84" x="0" y="0" width="555" height="1"/>
+			</line>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

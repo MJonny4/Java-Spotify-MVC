@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="productesIonFiltre" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c25aa64d-9cd1-4a02-b7ab-be92a58e88c8">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="ionTitol" class="java.lang.String"/>
+	<parameter name="ionActiu" class="java.lang.String"/>
+	<parameter name="ionTipus" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT p.producte_titol, e.estil_nom, p.producte_actiu, p.producte_tipus
+FROM PRODUCTE p JOIN ESTIL e ON e.estil_id = p.producte_estil
+
+WHERE ($P{ionActiu} IS NULL OR $P{ionActiu} = '' OR $P{ionActiu} = p.producte_actiu)
+AND
+($P{ionTipus} IS NULL OR $P{ionTipus} = '' OR
+$P{ionTipus} = p.producte_tipus)
+AND
+($P{ionTitol} IS NULL OR $P{ionTipus} = '' OR
+$P{ionTipus} = p.producte_titol)
+ORDER BY p.producte_id ASC]]>
+	</queryString>
+	<field name="PRODUCTE_TITOL" class="java.lang.String"/>
+	<field name="ESTIL_NOM" class="java.lang.String"/>
+	<field name="PRODUCTE_ACTIU" class="java.lang.String"/>
+	<field name="PRODUCTE_TIPUS" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="00b05697-56f7-4987-84f2-481959ee532c" x="26" y="41" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[PRODUCTE_TITOL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="73028065-7251-4d5e-a61e-a840209c3658" x="166" y="41" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[ESTIL_NOM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7294895a-bb86-4a45-9fbf-c8ed6c1e778d" x="305" y="41" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[PRODUCTE_ACTIU]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b2a503ce-5ba1-45b2-b44e-f166e3d9b205" x="442" y="41" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[PRODUCTE_TIPUS]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<textField>
+				<reportElement uuid="836a3f6b-1611-4477-bda5-03f835a10dfd" x="26" y="26" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{PRODUCTE_TITOL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d691e4f2-3253-4ee2-8689-388d9aa5e25b" x="166" y="26" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{ESTIL_NOM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d7a99439-dff3-4ae3-8898-c8147f45ff33" x="305" y="26" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{PRODUCTE_ACTIU}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="83da8ef5-1e3c-41c5-8b12-138fbd34b553" x="442" y="26" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{PRODUCTE_TIPUS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
