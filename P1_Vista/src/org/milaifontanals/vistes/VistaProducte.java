@@ -726,6 +726,49 @@ public class VistaProducte extends JPanel {
         }
       }
     });
+    buttonImprimir.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent event) {
+        char[] tipus = null;
+        char[] actiu = null;
+        String titol = null;
+
+        if (cbCancoFiltra.isSelected() && cbAlbumFiltra.isSelected() && cbLlistaFiltra.isSelected()) {
+          tipus = new char[] { 'C', 'A', 'L' };
+        } else if (cbCancoFiltra.isSelected() && cbAlbumFiltra.isSelected()) {
+          tipus = new char[] { 'C', 'A' };
+        } else if (cbCancoFiltra.isSelected() && cbLlistaFiltra.isSelected()) {
+          tipus = new char[] { 'C', 'L' };
+        } else if (cbAlbumFiltra.isSelected() && cbLlistaFiltra.isSelected()) {
+          tipus = new char[] { 'A', 'L' };
+        } else if (cbCancoFiltra.isSelected()) {
+          tipus = new char[] { 'C' };
+        } else if (cbAlbumFiltra.isSelected()) {
+          tipus = new char[] { 'A' };
+        } else if (cbLlistaFiltra.isSelected()) {
+          tipus = new char[] { 'L' };
+        } else {
+          tipus = null;
+        }
+
+        if (rbTotsActiuFiltra.isSelected()) {
+          actiu = new char[] { 'S', 'N' };
+        } else {
+          actiu = null;
+        }
+
+        if (textTitolFiltra.getText().equals("")) {
+          titol = null;
+        } else {
+          titol = textTitolFiltra.getText();
+        }
+
+        try {
+          BigIReport.generarInforme(tipus, actiu, titol);
+        } catch (Exception e) {
+          System.out.println("Error al generar el report.\n" + e.getMessage());
+        }
+      }
+    });
   }
 
   public VistaProducte() {

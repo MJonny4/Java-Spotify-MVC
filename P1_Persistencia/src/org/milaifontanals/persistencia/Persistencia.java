@@ -20,8 +20,7 @@ public class Persistencia {
   private static Connection con;
 
   private Persistencia() throws PersistenciaException {
-    //this("keys.properties"); TODO: descomentar aquesta línia i comentar la següent quan es passi a producció
-    this("C:\\Users\\isard\\Desktop\\P1-T8-MunteanuIon\\P1_Vista\\keys.properties");
+    this("keys.properties");
   }
 
   private Persistencia(String propsFitxer) throws PersistenciaException {
