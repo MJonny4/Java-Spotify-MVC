@@ -46,7 +46,7 @@ public class BigIReport {
 //    }
 //  }
 
-  public static void generarInforme(char[] tipus, char[] actiu, String titol) {
+  public static void generarInforme(char[] tipus, String actiu, String titol) {
     try {
       Properties propietats = new Properties();
       propietats.load(new FileInputStream("ireport.properties"));
@@ -58,9 +58,24 @@ public class BigIReport {
           throw new Exception("No s'ha trobat la clau " + claus[i] + " al fitxer " + nomFitxer);
         }
       }
-      String filtresProducte = "tipus=" + tipus[0] + "&actiu=" + actiu[0] + "&titol=" + titol;
+      String filtresProducte = "";
 
-      String url = valors[0]; //+ "?" + filtresProducte;
+      if (tipus != null && tipus.length > 0) {
+        for (int i = 0; i < tipus.length; i++) {
+          filtresProducte += "&ionTipus=" + tipus[i];
+        }
+      }
+
+      if (actiu != null && actiu.length() > 0) {
+        filtresProducte += "&ionActiu=" + actiu;
+      }
+
+      if (titol != null && !titol.isEmpty()) {
+        titol = titol.replaceAll("\\s", "");
+        filtresProducte += "&ionTitol=" + titol;
+      }
+
+      String url = valors[0] + "?" + filtresProducte;
       URL obj = new URL(url);
       HttpURLConnection con = (HttpURLConnection) obj.openConnection();
       con.setRequestMethod("GET");

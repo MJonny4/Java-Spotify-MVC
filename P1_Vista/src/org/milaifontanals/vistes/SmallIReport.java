@@ -27,12 +27,13 @@ import net.sf.jasperreports.view.JasperViewer;
  * @author isard
  */
 public class SmallIReport {
-  public void LlistaReproduccionsProducte(int producte_id) throws Exception {
+
+  public static void repInfoProducte(int producte_id) throws Exception {
     Connection conn = null;
     try {
       Properties props = new Properties();
       props.load(new FileInputStream("keys.properties"));
-      String[] claus = { "url", "user", "password" };
+      String[] claus = { "url", "user", "pass" };
       String[] valors = new String[3];
       for (int i = 0; i < claus.length; i++) {
         valors[i] = props.getProperty(claus[i]);
@@ -43,19 +44,14 @@ public class SmallIReport {
       conn = DriverManager.getConnection(valors[0], valors[1], valors[2]);
       conn.setAutoCommit(false);
 
-      JasperReport report = JasperCompileManager.compileReport("reportReproduccions.jrxml");
-      System.out.println("Informe compilat");
-      // Paràmetres pel report
+      JasperReport report = JasperCompileManager.compileReport("reproduccionsProductes.jrxml");
+      System.out.println("Ja Tens L'informe!");
       Map<String, Object> parameters = new HashMap<String, Object>();
-      // Cal emplenar "parameters" amb els diferents paràmetres del Report
-      parameters.put("paramProId", producte_id);
-      // Genera el report (sense paràmetres)
+      parameters.put("ionProducteID", producte_id);
       JasperPrint print = JasperFillManager.fillReport(report, parameters, conn);
       System.out.println("Informe generat");
-      // Exporta informe a PDF (hi ha diverses opcions)
       JasperExportManager.exportReportToPdfFile(print, "ReproduccionsDelProducte.pdf");
       System.out.println("Informe exportat a PDF");
-      // visualitza l'informe directament pel visor
       JasperViewer.viewReport(print, false);
       System.out.println("Informe visualitzat pel visor d'informes");
       conn.close();

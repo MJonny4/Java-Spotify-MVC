@@ -729,7 +729,7 @@ public class VistaProducte extends JPanel {
     buttonImprimir.addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent event) {
         char[] tipus = null;
-        char[] actiu = null;
+        String actiu = null;
         String titol = null;
 
         if (cbCancoFiltra.isSelected() && cbAlbumFiltra.isSelected() && cbLlistaFiltra.isSelected()) {
@@ -751,9 +751,11 @@ public class VistaProducte extends JPanel {
         }
 
         if (rbTotsActiuFiltra.isSelected()) {
-          actiu = new char[] { 'S', 'N' };
-        } else {
           actiu = null;
+        } else if (rbSiActiuFiltra.isSelected()) {
+          actiu = "S";
+        } else if (rbNoActiuFiltra.isSelected()) {
+          actiu = "N";
         }
 
         if (textTitolFiltra.getText().equals("")) {
@@ -766,6 +768,17 @@ public class VistaProducte extends JPanel {
           BigIReport.generarInforme(tipus, actiu, titol);
         } catch (Exception e) {
           System.out.println("Error al generar el report.\n" + e.getMessage());
+        }
+      }
+    });
+    repProducte.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent event) {
+        String producte_titol = textTitolMod.getText();
+        long producte_id = getId(producte_titol);
+        try {
+          SmallIReport.repInfoProducte((int) producte_id);
+        } catch (Exception e) {
+          e.printStackTrace();
         }
       }
     });
@@ -785,6 +798,7 @@ public class VistaProducte extends JPanel {
     cbCancoFiltra.setSelected(true);
     cbAlbumFiltra.setSelected(true);
     cbLlistaFiltra.setSelected(true);
+    repProducte.setEnabled(false);
 
     filtrar();
     commitOrRollback();
@@ -898,6 +912,7 @@ public class VistaProducte extends JPanel {
     switch (producte_tipus) {
       case "CANCO":
         mostrarCanco();
+        repProducte.setEnabled(true);
         textIdHiddenMod.setText(String.valueOf(producte_id));
         carregarCbTipusMod();
         cbTipusMod.setSelectedItem(producte_tipus);
@@ -919,8 +934,10 @@ public class VistaProducte extends JPanel {
             textDuradaMod.setText(String.valueOf(c.getDurada()));
             textAnyCreacioMod.setText(String.valueOf(c.getCanco_any_creacio()));
           }
+          //repProducte.setEnabled(false);
         } catch (PersistenciaException ex) {
           System.out.println("Error en mostrar canço.\n" + ex.getMessage());
+          repProducte.setEnabled(false);
         }
         break;
       case "ALBUM":
@@ -1791,6 +1808,8 @@ public class VistaProducte extends JPanel {
   public void commitOrRollback() {
     commit.setBounds(200, 600, 100, 30);
     rollback.setBounds(400, 600, 100, 30);
+    repProducte.setBounds(340, 500, 150, 30);
+    this.add(repProducte);
     this.add(commit);
     this.add(rollback);
 
@@ -1798,8 +1817,7 @@ public class VistaProducte extends JPanel {
       @Override
       public void actionPerformed(ActionEvent e) {
         commit();
-        commit.setEnabled(false);
-        rollback.setEnabled(false);
+
       }
     });
 
@@ -1807,8 +1825,6 @@ public class VistaProducte extends JPanel {
       @Override
       public void actionPerformed(ActionEvent e) {
         rollback();
-        commit.setEnabled(false);
-        rollback.setEnabled(false);
       }
     });
   }
@@ -1849,4 +1865,7 @@ public class VistaProducte extends JPanel {
 
   JButton commit = new JButton("Commit");
   JButton rollback = new JButton("Rollback");
+
+  JButton repProducte = new JButton("Reproduccions");
+
 }
