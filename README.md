@@ -16,6 +16,9 @@
     + Hi han dos ComboBox amb els productes disponibles i amb els ja utilitzats per poder eliminar-los
     + Hi ha un botó per afegir un nou producte a la llista
     + Hi ha un botó per eliminar un producte de la llista
+  - (ALBUM) ELS PRODUCTES NOMES PODEN SER DISPONIBLES SI NO ESTAN EN ALTRES ALBUMS
+  - (LLISTA) ELS PRODUCTES NOMES PODEN SER DISPONIBLES SI NO ESTAN EN ALTRES LLISTES
+  - Si algun dels camps de afegir o eliminar esta buit, no hi han productes, crean un :D
 
 + Programa pot eliminar un producte si hi ha una fila seleccionada
   + NO ES POT ELIMINAR: 
@@ -28,3 +31,9 @@
   + Si fas rollback, es cancelaran els canvis a la base de dades
   + Si surts dels programa et preguntara si vols fer commit o rollback
     - Si tanques el programa no fara commit i tancara la connexio amb la base de dades
+    
++ Imprimir: Es com el boto de Filtrar pero ho mostrara en PDF. simple
++ Reproduccions: Aquest Boto nomes esta implementat per a Cancons i mostra el moment i el client que l'ha reproduit
+  - Si el document esta en blanc significa que la canco no te reproduccions.
+  
++ Nateja: Aquest boto com el nom indica tornas al principi i es borra tots els processos que estiguis fent.

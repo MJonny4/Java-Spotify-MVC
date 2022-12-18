@@ -360,6 +360,7 @@ public class VistaProducte extends JPanel {
   }
 
   public void netejar() {
+    repProducte.setEnabled(false);
     labelTitolModProductes.setText("");
     textIdHiddenMod.setText("");
     cbTipusMod.removeAllItems();
@@ -546,7 +547,7 @@ public class VistaProducte extends JPanel {
 
         if (tipus.equals("ALBUM")) {
           int posicio[] = new int[tableAlbumOLlista.getRowCount()];
-          int posicioDisponible = 0;
+          int posicioDisponible = 1;
 
           for (int i = 0; i < tableAlbumOLlista.getRowCount(); i++) {
             posicio[i] = (int) tableAlbumOLlista.getValueAt(i, 2);
@@ -576,7 +577,7 @@ public class VistaProducte extends JPanel {
           }
         } else if (tipus.equals("LLISTA")) {
           int posicion[] = new int[tableAlbumOLlista.getRowCount()];
-          int posicionDisponible = 0;
+          int posicionDisponible = 1;
 
           for (int i = 0; i < tableAlbumOLlista.getRowCount(); i++) {
             posicion[i] = (int) tableAlbumOLlista.getValueAt(i, 2);
@@ -614,7 +615,7 @@ public class VistaProducte extends JPanel {
         int id = (int) getId(producte_titol);
 
         if (tipus.equals("ALBUM")) {
-          if (cbNoDisponibles.getItemCount() == 1) {
+          if (cbNoDisponibles.getItemCount() < 1) {
             JOptionPane.showConfirmDialog(null, "El album no te cap canço", "Error", JOptionPane.DEFAULT_OPTION,
                 JOptionPane.ERROR_MESSAGE);
           } else {
@@ -628,7 +629,7 @@ public class VistaProducte extends JPanel {
             }
           }
         } else if (tipus.equals("LLISTA")) {
-          if (cbNoDisponibles.getItemCount() == 1) {
+          if (cbNoDisponibles.getItemCount() < 1) {
             JOptionPane.showConfirmDialog(null, "La llista no te cap canço", "Error", JOptionPane.DEFAULT_OPTION,
                 JOptionPane.ERROR_MESSAGE);
           } else {
